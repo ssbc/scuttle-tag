@@ -1,4 +1,4 @@
-var { Value, Set, Struct, computed } = require('mutant')
+var { Value, Dict, Set, Struct, throttle, computed } = require('mutant')
 var pull = require('pull-stream')
 var ref = require('ssb-ref')
 var set = require('lodash/set')
@@ -8,8 +8,17 @@ var isEmpty = require('lodash/isEmpty')
 
 var tagsCache = {}
 var messagesCache = {}
+var tagLookup = Dict()
 var cacheLoading = false
 var sync = Value(false)
+
+function TagRef (id) {
+  return Struct({
+    id,
+    updatedAt: Value(0),
+    count: Value(0)
+  }, { merge: true })
+}
 
 function Tag (server) {
   return (tagId, nameFn) => {
@@ -36,6 +45,26 @@ function Tag (server) {
   }
 }
 
+function recent (server) {
+  return () => {
+    if (!cacheLoading) {
+      cacheLoading = true
+      loadCache(server)
+    }
+    return withSync(getRecent(tagLookup))
+  }
+}
+
+function mostActive (server) {
+  return () => {
+    if (!cacheLoading) {
+      cacheLoading = true
+      loadCache(server)
+    }
+    return withSync(getMostActive(tagLookup))
+  }
+}
+
 function messageTags (server) {
   return (msgId) => {
     if (!ref.isLink(msgId)) throw new Error('Requires an ssb ref!')
@@ -58,7 +87,13 @@ function messageTaggers (server) {
 }
 
 function allTags (server) {
-  return () => withSync(getAllTags(getCache(server, tagsCache)))
+  return () => {
+    if (!cacheLoading) {
+      cacheLoading = true
+      loadCache(server)
+    }
+    withSync(getAllTags(tagsCache))
+  }
 }
 
 function allTagsFrom (server) {
@@ -90,14 +125,6 @@ function getObs (id, server, lookup) {
     lookup[id] = Value({})
   }
   return lookup[id]
-}
-
-function getCache (server, lookup) {
-  if (!cacheLoading) {
-    cacheLoading = true
-    loadCache(server)
-  }
-  return lookup
 }
 
 function update (id, values, server, lookup) {
@@ -143,10 +170,12 @@ function loadCache (server) {
         for (const author in item) {
           update(author, item[author], server, tagsCache)
 
-          // generate message lookup
           for (const tag in item[author]) {
             for (const message in item[author][tag]) {
+              // generate message lookup
               set(messageLookup, [message, tag, author], item[author][tag][message])
+              // populate tag lookup
+              populateTagLookup(tag, item[author][tag][message])
             }
           }
         }
@@ -162,6 +191,7 @@ function loadCache (server) {
       } else if (item && ref.isLink(item.tagKey) && ref.isFeedId(item.author) && ref.isLink(item.message)) {
         // handle realtime updates
         const { tagKey, author, message, tagged, timestamp } = item
+        populateTagLookup(tagKey, timestamp)
         if (tagged) {
           update(author, { [tagKey]: { [message]: timestamp } }, server, tagsCache)
           update(message, { [tagKey]: { [author]: timestamp } }, server, messagesCache)
@@ -172,6 +202,31 @@ function loadCache (server) {
       }
     })
   )
+}
+
+function populateTagLookup (tag, timestamp) {
+  var obs = tagLookup.get(tag)
+  if (!obs) {
+    obs = TagRef(tag)
+    tagLookup.put(tag, obs)
+  }
+  const count = obs.count() + 1
+  const updatedAt = timestamp ? Math.max(obs.updatedAt(), timestamp) : obs.updatedAt()
+  obs.set({ id: tag, count, updatedAt })
+}
+
+function getRecent () {
+  return computed(throttle(tagLookup, 1000), (lookup) => {
+    var values = Object.keys(lookup).map(x => lookup[x]).sort((a, b) => b.updatedAt - a.updatedAt).map(x => x.id)
+    return values
+  })
+}
+
+function getMostActive (lookup) {
+  return computed(tagLookup, (lookup) => {
+    var values = Object.keys(lookup).map(x => lookup[x]).sort((a, b) => b.count - a.count).map(x => [x.id, x.count])
+    return values
+  })
 }
 
 function getTaggedMessages (lookup, key) {
@@ -236,6 +291,8 @@ function getAllTagsFrom (lookup) {
 
 module.exports = {
   Tag,
+  recent,
+  mostActive,
   messageTags,
   messageTagsFrom,
   messageTaggers,

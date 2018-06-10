@@ -53,6 +53,14 @@ Sets the name of a tag and calls cb when done.
 
 Returns a [Mutant](https://github.com/mmckegg/mutant) observable Struct which represents a tag. This struct holds the `tagId` and `tagName`. Takes an optional `nameFn` which returns an observable representing the `tagName`. If `nameFn` is not provided it will attempt to use the [ssb-names](https://github.com/ssbc/ssb-names) plugin and if that is not available its short id will be used.
 
+### tag.obs.recent()
+
+Returns a Mutant obserable list of most recently used tags
+
+### tag.obs.mostActive()
+
+Returns a Mutant observable list of most actively used tags
+
 ### tag.obs.messageTags(msgId)
 
 Returns a Mutant observable list of tagIds which have been applied to the message `msgId`.
