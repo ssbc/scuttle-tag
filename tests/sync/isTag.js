@@ -5,17 +5,20 @@ const isTag = require('../../sync/isTag')()
 test('isTag / tag schema', t => {
   const notTag = {
     type: 'post',
+    version: 1,
     tagged: true,
     message: '%sfoIYo0kKKGI+TJYnznVDSs3BM/HjMWdCPXirvj9BfE=.sha256'
   }
   t.notOk(isTag(notTag), 'invalidates messages that are not tags')
 
   const simpleTag = {
-    type: 'tag'
+    type: 'tag',
+    version: 1
   }
   t.ok(isTag(simpleTag), 'validates simple tag')
 
   const incompleteTag = {
+    version: 1,
     tagged: true,
     message: '%sfoIYo0kKKGI+TJYnznVDSs3BM/HjMWdCPXirvj9BfE=.sha256'
   }
@@ -24,6 +27,7 @@ test('isTag / tag schema', t => {
 
   const malformedTag = {
     type: 'tag',
+    version: 1,
     tagged: true,
     message: '%sfoIYo0kKKGI+TJYnznVDSs3BM'
   }
@@ -39,6 +43,7 @@ test('isTag / tag schema', t => {
       hash: 'sha256',
       content: {
         type: 'tag',
+        version: 1,
         tagged: true,
         message: '%ZXmZDRwPr0AKrNUoFnW/Yo0k3a7p6W716uEXDVnie2w=.sha256',
         root: '%V6Icaj1qhGrq6ocbP4pmzNLAO3dpNM/Besx+++Z+bE0=.sha256',

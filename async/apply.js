@@ -3,6 +3,7 @@ const { heads } = require('ssb-sort')
 const { isFeedId } = require('ssb-ref')
 const isTag = require('../sync/isTag')
 const TagError = require('../sync/TagError')
+const { SCHEMA_VERSION } = require('../schema/version')
 
 module.exports = function (server) {
   return function applyTag (data, cb) {
@@ -18,6 +19,7 @@ module.exports = function (server) {
 
         var msg = {
           type: 'tag',
+          version: SCHEMA_VERSION,
           tagged,
           message,
           root: tag,

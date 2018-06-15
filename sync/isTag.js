@@ -4,7 +4,7 @@ const schema = require('../schema/tag')
 
 const isTagContent = validator(schema, {verbose: true})
 
-module.exports = function (server, api) {
+module.exports = function (server) {
   return function isTag (obj) {
     const result = isTagContent(getMsgContent(obj))
 
