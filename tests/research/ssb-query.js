@@ -1,3 +1,7 @@
+// INSTRUCTIONS:
+// - run patchbay (or something with a modern ssb-query installed)
+// - run this file! `node tests/research/ssb-query.js`
+
 const pull = require('pull-stream')
 const Client = require('ssb-client')
 const config = require('./config')
