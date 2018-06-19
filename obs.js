@@ -103,10 +103,17 @@ function allTagsFrom (server) {
   }
 }
 
+function messagesTaggedBy (server) {
+  return (author) => {
+    if (!ref.isFeedId(author)) throw new Error('Requires an ssb ref!')
+    return withSync(computed(getObs(author, server, tagsCache), getMessagesTaggedBy))
+  }
+}
+
 function messagesTaggedByWith (server) {
   return (author, tagId) => {
     if (!ref.isFeedId(author) || !ref.isLink(tagId)) throw new Error('Requires an ssb ref!')
-    return withSync(computed([getObs(author, server, tagsCache), tagId], getTaggedMessages))
+    return withSync(computed([getObs(author, server, tagsCache), tagId], getMessagesTaggedByWith))
   }
 }
 
@@ -229,7 +236,19 @@ function getMostActive (lookup) {
   })
 }
 
-function getTaggedMessages (lookup, key) {
+function getMessagesTaggedBy (lookup) {
+  const messages = Set([])
+  for (const tag in lookup) {
+    for (const msg in lookup[tag]) {
+      if (lookup[tag][msg]) {
+        messages.add(msg)
+      }
+    }
+  }
+  return messages
+}
+
+function getMessagesTaggedByWith (lookup, key) {
   const messages = []
   for (const msg in lookup[key]) {
     if (lookup[key][msg]) {
@@ -298,5 +317,6 @@ module.exports = {
   messageTaggers,
   allTags,
   allTagsFrom,
+  messagesTaggedBy,
   messagesTaggedByWith
 }
