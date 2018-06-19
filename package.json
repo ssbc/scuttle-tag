@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tape tests/**/*.js | tap-spec",
+    "test": "tape tests/**/*test.js | tap-spec",
     "lint": "standard --fix"
   },
   "repository": {
@@ -21,12 +21,15 @@
     "mutant": "^3.22.1",
     "mutant-pull-reduce": "^1.1.0",
     "pull-defer": "^0.2.2",
-    "pull-stream": "^3.6.1",
     "ssb-msg-content": "^1.0.1",
     "ssb-ref": "^2.9.1",
     "ssb-sort": "^1.1.0"
   },
   "devDependencies": {
+    "pull-stream": "^3.6.8",
+    "ssb-client": "^4.5.7",
+    "ssb-config": "^2.2.0",
+    "ssb-keys": "^7.0.16",
     "standard": "^11.0.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.9.0"
