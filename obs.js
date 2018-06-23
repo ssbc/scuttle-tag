@@ -103,13 +103,6 @@ function allTagsFrom (server) {
   }
 }
 
-function messagesTaggedByWith (server) {
-  return (author, tagId) => {
-    if (!ref.isFeedId(author) || !ref.isLink(tagId)) throw new Error('Requires an ssb ref!')
-    return withSync(computed([getObs(author, server, tagsCache), tagId], getTaggedMessages))
-  }
-}
-
 function withSync (obs) {
   obs.sync = sync
   return obs
@@ -229,16 +222,6 @@ function getMostActive (lookup) {
   })
 }
 
-function getTaggedMessages (lookup, key) {
-  const messages = []
-  for (const msg in lookup[key]) {
-    if (lookup[key][msg]) {
-      messages.push(msg)
-    }
-  }
-  return messages
-}
-
 function getMessageTags (lookup) {
   const tags = []
   for (const tag in lookup) {
@@ -297,6 +280,5 @@ module.exports = {
   messageTagsFrom,
   messageTaggers,
   allTags,
-  allTagsFrom,
-  messagesTaggedByWith
+  allTagsFrom
 }
