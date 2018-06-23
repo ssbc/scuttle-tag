@@ -5,6 +5,7 @@ const methods = {
     name: require('./async/name')
   },
   obs: require('./obs'),
+  pull: require('./pull'),
   sync: {
     isTag: require('./sync/isTag')
   }
