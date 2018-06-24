@@ -22,6 +22,7 @@
     "mutant-pull-reduce": "^1.1.0",
     "pull-defer": "^0.2.2",
     "pull-stream": "^3.6.1",
+    "scuttle-inject": "^1.0.0",
     "ssb-msg-content": "^1.0.1",
     "ssb-ref": "^2.9.1",
     "ssb-sort": "^1.1.0"

@@ -12,5 +12,5 @@ const methods = {
 }
 
 module.exports = function ScuttleTag (server) {
-  return require('./lib/inject')(server, methods)
+  return require('scuttle-inject')(server, methods)
 }
