@@ -54,7 +54,12 @@ function messagesTagged (server) {
       {$filter: {
         value: {
           timestamp: { $gt: 0 },
-          content: { type: 'tag' }
+          content: {
+            type: 'tag',
+            version: 1,
+            root: { $prefix: '%' },
+            message: { $prefix: '%' }
+          }
         }
       }},
       mapQuery,
@@ -71,7 +76,9 @@ function messagesTaggedWith (server) {
           timestamp: { $gt: 0 },
           content: {
             type: 'tag',
-            root: tagId
+            version: 1,
+            root: tagId,
+            message: { $prefix: '%' }
           }
         }
       }},
@@ -88,7 +95,12 @@ function messagesTaggedBy (server) {
         value: {
           timestamp: { $gt: 0 },
           author,
-          content: { type: 'tag' }
+          content: {
+            type: 'tag',
+            version: 1,
+            root: { $prefix: '%' },
+            message: { $prefix: '%' }
+          }
         }
       }},
       mapQuery,
@@ -106,7 +118,9 @@ function messagesTaggedWithBy (server) {
           author,
           content: {
             type: 'tag',
-            root: tagId
+            version: 1,
+            root: tagId,
+            message: { $prefix: '%' }
           }
         }
       }},
