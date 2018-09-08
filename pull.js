@@ -9,7 +9,7 @@ const filter = (stream) => {
   )
 }
 
-function messagesTagged (server) {
+function allTags (server) {
   return (opts = {}) => filter(server.query.read(merge(opts, {
     query: [
       {$filter: {
@@ -27,7 +27,7 @@ function messagesTagged (server) {
   })))
 }
 
-function messagesTaggedWith (server) {
+function tagsOf (server) {
   return (tagId, opts = {}) => filter(server.query.read(merge(opts, {
     query: [
       {$filter: {
@@ -45,7 +45,7 @@ function messagesTaggedWith (server) {
   })))
 }
 
-function messagesTaggedBy (server) {
+function tagsFrom (server) {
   return (author, opts = {}) => filter(server.query.read(merge(opts, {
     query: [
       {$filter: {
@@ -64,7 +64,7 @@ function messagesTaggedBy (server) {
   })))
 }
 
-function messagesTaggedWithBy (server) {
+function tagsOfFrom (server) {
   return (tagId, author, opts = {}) => filter(server.query.read(merge(opts, {
     query: [
       {$filter: {
@@ -84,8 +84,8 @@ function messagesTaggedWithBy (server) {
 }
 
 module.exports = {
-  messagesTagged,
-  messagesTaggedWith,
-  messagesTaggedBy,
-  messagesTaggedWithBy
+  allTags,
+  tagsOf,
+  tagsFrom,
+  tagsOfFrom
 }
